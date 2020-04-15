@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Helper.Checkers;
+using Helper.Jobs;
 using Newtonsoft.Json;
 
 namespace Helper
@@ -14,9 +15,26 @@ namespace Helper
         });
 
         [JsonIgnore]
-        public IReadOnlyCollection<IChecker> AllCheckers => Checkers.ChatAvailableChecker;
+        public IReadOnlyCollection<IChecker> AllCheckers => Checkers.ChatAvailableCheckers;
+
+        [JsonIgnore]
+        public IReadOnlyCollection<IJob> AllJobs => Jobs.ClearGitRepositoryJobs;
 
         public AllCheckers Checkers { get; set; }
+
+        public AllJobs Jobs { get; set; }
+
+        public Project()
+        {
+            Checkers = new AllCheckers
+            {
+                ChatAvailableCheckers = new ChatAvailableChecker[0]
+            };
+            Jobs = new AllJobs
+            {
+                ClearGitRepositoryJobs = new ClearGitRepositoryJob[0]
+            };
+        }
 
         public void Save(Stream stream)
         {
@@ -28,12 +46,27 @@ namespace Helper
         {
             using var reader = new StreamReader(stream);
             using var jsonReader = new JsonTextReader(reader);
-            return JsonSerializer.Deserialize<Project>(jsonReader);
+            var project = JsonSerializer.Deserialize<Project>(jsonReader);
+
+            project.Jobs = new AllJobs
+            {
+                ClearGitRepositoryJobs = new[]
+                {
+                    new ClearGitRepositoryJob { Url = "https://github.com/kalantyr/Art.git", UserName = "userName", Password = "password" }
+                }
+            };
+
+            return project;
         }
     }
 
     public class AllCheckers
     {
-        public ChatAvailableChecker[] ChatAvailableChecker { get; set; }
+        public ChatAvailableChecker[] ChatAvailableCheckers { get; set; }
+    }
+
+    public class AllJobs
+    {
+        public ClearGitRepositoryJob[] ClearGitRepositoryJobs { get; set; }
     }
 }

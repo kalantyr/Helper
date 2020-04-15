@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
-using Helper.Checkers;
+using System.Reflection;
 
 namespace Helper
 {
     public partial class App
     {
+        private static string _tempFolder;
+
         public Project Project { get; private set; }
 
         public App()
@@ -15,13 +17,7 @@ namespace Helper
 
         public void NewProject()
         {
-            Project = new Project
-            {
-                Checkers = new AllCheckers
-                {
-                    ChatAvailableChecker = new ChatAvailableChecker[0]
-                }
-            };
+            Project = new Project();
             ProjectChanged?.Invoke(this, EventArgs.Empty);
         }
 
@@ -37,5 +33,21 @@ namespace Helper
         }
 
         public EventHandler ProjectChanged;
+
+        public static string TempFolder
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_tempFolder))
+                {
+                    var fi = new FileInfo(Assembly.GetEntryAssembly().Location);
+                    var tempFolder = Path.Combine(fi.DirectoryName, "temp");
+                    if (!Directory.Exists(tempFolder))
+                        Directory.CreateDirectory(tempFolder);
+                    _tempFolder = tempFolder;
+                }
+                return _tempFolder;
+            }
+        }
     }
 }

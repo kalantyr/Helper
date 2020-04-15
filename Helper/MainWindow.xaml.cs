@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using Helper.Utils;
 using Microsoft.Win32;
@@ -18,12 +19,19 @@ namespace Helper
 
             Activated += (sender, e) => WindowsUtils.StopFlash(this);
 
-            OnProjectChanged(this, EventArgs.Empty);
+            Loaded += (sender, e) =>
+            {
+                if (File.Exists(Settings.Default.LastProjectFile))
+                    Load(Settings.Default.LastProjectFile);
+            };
         }
 
-        private void OnProjectChanged(object sender, EventArgs e)
+        private async void OnProjectChanged(object sender, EventArgs e)
         {
             _checkers.Project = Project;
+
+            foreach (var job in Project.AllJobs)
+                await job.Run(CancellationToken.None);
         }
 
         private void OnExitClick(object sender, RoutedEventArgs e)
