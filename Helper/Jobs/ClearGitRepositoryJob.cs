@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -15,11 +17,25 @@ namespace Helper.Jobs
     {
         private const int RemoveOlderThanDays = 90;
 
+        private static readonly IDictionary<string, Credentials> CredentialsCache = new ConcurrentDictionary<string, Credentials>();
+
         public string Url { get; set; }
 
-        public string UserName { get; set; }
+        private string UserName { get; set; }
 
-        public string Password { get; set; }
+        private string Password { get; set; }
+
+        private string RepositoryHost
+        {
+            get
+            {
+                var i = Url.LastIndexOf('/');
+                if (i < 0)
+                    throw new NotImplementedException();
+
+                return Url.Substring(0, i);
+            }
+        }
 
         [JsonIgnore]
         public ICheckerHistory History { get; }
@@ -41,6 +57,8 @@ namespace Helper.Jobs
                 return repoName.Replace(".git", string.Empty);
             }
         }
+
+        public Func<string, Credentials> GetCredentials;
 
         private PushStatusError LastPushError { get; set; }
 
@@ -125,11 +143,7 @@ namespace Helper.Jobs
             try
             {
                 Directory.CreateDirectory(RepositoryFolder);
-                var options = new CloneOptions
-                {
-                    CredentialsProvider = CredentialsHandler,
-                    CertificateCheck = OnCertificateCheck 
-                };
+                var options = new CloneOptions { CredentialsProvider = CredentialsHandler };
                 Repository.Clone(Url, RepositoryFolder, options);
             }
             catch (Exception e)
@@ -143,18 +157,23 @@ namespace Helper.Jobs
             }
         }
 
-        private bool OnCertificateCheck(Certificate certificate, bool valid, string host)
-        {
-            throw new NotImplementedException();
-        }
-
         private Credentials CredentialsHandler(string url, string usernamefromurl, SupportedCredentialTypes types)
         {
-            return new UsernamePasswordCredentials
+            if (!CredentialsCache.ContainsKey(RepositoryHost))
             {
-                Username = UserName,
-                Password = Password
-            };
+                if (GetCredentials != null)
+                {
+                    var credentials = GetCredentials("Enter credentials for " + RepositoryHost);
+                    if (credentials != null)
+                        CredentialsCache.Add(RepositoryHost, credentials);
+                    else
+                        return null;
+                }
+                else
+                    return null;
+            }
+
+            return CredentialsCache[RepositoryHost];
         }
 
         private static bool Skip(Branch branch)

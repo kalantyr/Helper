@@ -4,6 +4,8 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using Helper.Jobs;
+using Helper.Windows;
+using LibGit2Sharp;
 
 namespace Helper.UserControls
 {
@@ -22,10 +24,22 @@ namespace Helper.UserControls
                 _job = value;
 
                 if (_job != null)
+                {
                     _job.History.Changed += HistoryChanged;
+                    if (_job is ClearGitRepositoryJob gitRepositoryJob)
+                        gitRepositoryJob.GetCredentials = OnGetCredentials;
+                }
 
                 TuneControls();
             }
+        }
+
+        private Credentials OnGetCredentials(string s)
+        {
+            var window = new GitCredentialsWindow(s) { Owner = App.GetWindow(this) };
+            return window.ShowDialog() == true
+                ? window.Credentials
+                : null;
         }
 
         public JobControl()

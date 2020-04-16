@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using Helper.Utils;
 using Microsoft.Win32;
+using Size = System.Windows.Size;
 
 namespace Helper
 {
@@ -14,6 +15,12 @@ namespace Helper
         {
             InitializeComponent();
 
+            if (Settings.Default.MainWindowSize != Size.Empty)
+            {
+                Width = Settings.Default.MainWindowSize.Width;
+                Height = Settings.Default.MainWindowSize.Height;
+            }
+
             ((App)Application.Current).ProjectChanged += OnProjectChanged;
 
             Activated += (sender, e) => WindowsUtils.StopFlash(this);
@@ -23,6 +30,20 @@ namespace Helper
                 if (File.Exists(Settings.Default.LastProjectFile))
                     Load(Settings.Default.LastProjectFile);
             };
+
+            SizeChanged += MainWindow_SizeChanged;
+        }
+
+        private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (e.NewSize == Size.Empty)
+                return;
+
+            if (Settings.Default.MainWindowSize == e.NewSize)
+                return;
+
+            Settings.Default.MainWindowSize = e.NewSize;
+            Settings.Default.Save();
         }
 
         private void OnProjectChanged(object sender, EventArgs e)
