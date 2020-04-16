@@ -42,6 +42,9 @@ namespace Helper
                 {
                     var fi = new FileInfo(Assembly.GetEntryAssembly().Location);
                     var tempFolder = Path.Combine(fi.DirectoryName, "temp");
+
+                    tempFolder = @"C:\H_T";
+
                     if (!Directory.Exists(tempFolder))
                         Directory.CreateDirectory(tempFolder);
                     _tempFolder = tempFolder;

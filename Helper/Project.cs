@@ -26,13 +26,73 @@ namespace Helper
 
         public Project()
         {
+            const string userName = @"REGION\VTB198703";
+            const string password = "******";
+            const string gitHost = "http://tfs4alm10v:8080/tfs/TFS2005%20-%20upgraded%20Projects/CustomerPortal/_git/";
+
             Checkers = new AllCheckers
             {
                 ChatAvailableCheckers = new ChatAvailableChecker[0]
             };
             Jobs = new AllJobs
             {
-                ClearGitRepositoryJobs = new ClearGitRepositoryJob[0]
+                ClearGitRepositoryJobs = new[]
+                {
+                    new ClearGitRepositoryJob
+                    {
+                        Url = gitHost + "nuget-logs",
+                        UserName = userName,
+                        Password = password
+                    },
+                    new ClearGitRepositoryJob
+                    {
+                        Url = gitHost + "nuget-adapters",
+                        UserName = userName,
+                        Password = password
+                    },
+                    new ClearGitRepositoryJob
+                    {
+                        Url = gitHost + "database",
+                        UserName = userName,
+                        Password = password
+                    },
+                    new ClearGitRepositoryJob
+                    {
+                        Url = gitHost + "user-ui",
+                        UserName = userName,
+                        Password = password
+                    },
+                    new ClearGitRepositoryJob
+                    {
+                        Url = gitHost + "support",
+                        UserName = userName,
+                        Password = password
+                    },
+                    new ClearGitRepositoryJob
+                    {
+                        Url = gitHost + "portal",
+                        UserName = userName,
+                        Password = password
+                    },
+                    new ClearGitRepositoryJob
+                    {
+                        Url = gitHost + "Vtb.WebServices.AuthorizationServices",
+                        UserName = userName,
+                        Password = password
+                    },
+                    new ClearGitRepositoryJob
+                    {
+                        Url = gitHost + "Vtb.WebServices.AuthService",
+                        UserName = userName,
+                        Password = password
+                    },
+                    new ClearGitRepositoryJob
+                    {
+                        Url = gitHost + "v6.backend.integration.api",
+                        UserName = userName,
+                        Password = password
+                    },
+                }
             };
         }
 
@@ -46,18 +106,7 @@ namespace Helper
         {
             using var reader = new StreamReader(stream);
             using var jsonReader = new JsonTextReader(reader);
-            var project = JsonSerializer.Deserialize<Project>(jsonReader);
-
-            project.Jobs = new AllJobs
-            {
-                ClearGitRepositoryJobs = new[]
-                {
-                    new ClearGitRepositoryJob { Url = "https://github.com/kalantyr/Art.git", UserName = "userName", Password = "password" },
-                    new ClearGitRepositoryJob { Url = "https://github.com/neowutran/ShinraMeter.git", UserName = "userName", Password = "password" }
-                }
-            };
-
-            return project;
+            return JsonSerializer.Deserialize<Project>(jsonReader);
         }
     }
 

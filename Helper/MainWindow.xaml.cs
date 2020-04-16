@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
 using System.Windows;
 using Helper.Utils;
 using Microsoft.Win32;
@@ -49,9 +48,6 @@ namespace Helper
         {
             using var file = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
                 ((App) Application.Current).LoadProject(file);
-
-            //App.CurrentCharacter = _data.Characters.FirstOrDefault();
-            //TuneControls(_data);
         }
 
         private void OnSaveClick(object sender, RoutedEventArgs e)

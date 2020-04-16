@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Helper.Checkers;
+using Helper.Utils.Jobs;
 using LibGit2Sharp;
 using Newtonsoft.Json;
 
@@ -11,11 +13,8 @@ namespace Helper.Jobs
 {
     public class ClearGitRepositoryJob : IJob
     {
-        private static readonly string[] BranchStopWords =
-        {
-            "release", "master"
-        };
-        
+        private const int RemoveOlderThanDays = 90;
+
         public string Url { get; set; }
 
         public string UserName { get; set; }
@@ -43,6 +42,8 @@ namespace Helper.Jobs
             }
         }
 
+        private PushStatusError LastPushError { get; set; }
+
         public ClearGitRepositoryJob()
         {
             History = new CheckerHistory();
@@ -52,7 +53,7 @@ namespace Helper.Jobs
         {
             try
             {
-                Fetch();
+                CloneOrFetch();
 
                 var options = new PushOptions
                 {
@@ -64,13 +65,29 @@ namespace Helper.Jobs
                 {
                     var remote = repository.Network.Remotes["origin"];
 
-                    foreach (var branch in repository.Branches.Where(br => br.IsRemote))
-                    {
-                        if (Skip(branch))
-                            continue;
+                    var forRemove = repository.Branches
+                        .Where(br => br.IsRemote)
+                        .Where(branch => !Skip(branch))
+                        .OrderBy(GetLastCommitDate)
+                        .ToArray();
 
-                        repository.Network.Push(remote, ":" + branch.UpstreamBranchCanonicalName, options);
-                    }
+                    foreach (var branch in forRemove)
+                        try
+                        {
+                            repository.Network.Push(remote, ":" + branch.UpstreamBranchCanonicalName, options);
+                            if (LastPushError != null)
+                            {
+                                if (LastPushError.Message.Contains("You need to have 'ForcePush'"))
+                                    continue;
+                                throw new Exception(LastPushError.Message);
+                            }
+                            else
+                                Equals(null);
+                        }
+                        finally
+                        {
+                            LastPushError = null;
+                        }
                 }
 
                 History.AddResult(DateTime.Now, true);
@@ -83,23 +100,52 @@ namespace Helper.Jobs
 
         private void OnPushStatusError(PushStatusError pushstatuserrors)
         {
-            throw new NotImplementedException();
+            LastPushError = pushstatuserrors;
+        }
+
+        private void CloneOrFetch()
+        {
+            if (!Directory.Exists(RepositoryFolder))
+                Clone();
+            else
+                Fetch();
         }
 
         private void Fetch()
         {
-            if (!Directory.Exists(RepositoryFolder))
+            using (var repository = new Repository(RepositoryFolder))
+            {
+                var options = new FetchOptions {CredentialsProvider = CredentialsHandler};
+                Commands.Fetch(repository, "origin", new string[0], options, string.Empty);
+            }
+        }
+
+        private void Clone()
+        {
+            try
             {
                 Directory.CreateDirectory(RepositoryFolder);
-                var options = new CloneOptions { CredentialsProvider = CredentialsHandler };
+                var options = new CloneOptions
+                {
+                    CredentialsProvider = CredentialsHandler,
+                    CertificateCheck = OnCertificateCheck 
+                };
                 Repository.Clone(Url, RepositoryFolder, options);
             }
-            else
-                using (var repository = new Repository(RepositoryFolder))
-                {
-                    var options = new FetchOptions { CredentialsProvider = CredentialsHandler };
-                    Commands.Fetch(repository, "origin", new string[0], options, string.Empty);
-                }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+
+                if (Directory.Exists(RepositoryFolder))
+                    Directory.Delete(RepositoryFolder, true);
+
+                throw;
+            }
+        }
+
+        private bool OnCertificateCheck(Certificate certificate, bool valid, string host)
+        {
+            throw new NotImplementedException();
         }
 
         private Credentials CredentialsHandler(string url, string usernamefromurl, SupportedCredentialTypes types)
@@ -113,16 +159,19 @@ namespace Helper.Jobs
 
         private static bool Skip(Branch branch)
         {
-            foreach (var stopWord in BranchStopWords)
-                if (branch.CanonicalName.Contains("/" + stopWord, StringComparison.InvariantCultureIgnoreCase))
-                    return true;
+            if (ClearGitRepositoryJobUtils.SkipBranchByName(branch.CanonicalName))
+                return true;
 
-            var lastCommitDate = branch.Commits.Max(c => c.Author.When);
-            var elapsed = DateTimeOffset.Now - lastCommitDate;
-            if (elapsed.TotalDays < 90)
+            var elapsed = DateTimeOffset.Now - GetLastCommitDate(branch);
+            if (elapsed.TotalDays < RemoveOlderThanDays)
                 return true;
 
             return false;
+        }
+
+        private static DateTimeOffset GetLastCommitDate(Branch branch)
+        {
+            return branch.Commits.Max(c => c.Author.When);
         }
     }
 }
