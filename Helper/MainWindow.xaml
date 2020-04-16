@@ -19,6 +19,13 @@
             </MenuItem>
         </Menu>
 
-        <userControls:CheckersControl x:Name="_checkers" Grid.Row="1"/>
+        <TabControl Grid.Row="1">
+            <TabItem Header="Checkers">
+                <userControls:CheckersControl x:Name="_checkers"/>
+            </TabItem>
+            <TabItem Header="Jobs">
+                <userControls:JobsControl x:Name="_jobs"/>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

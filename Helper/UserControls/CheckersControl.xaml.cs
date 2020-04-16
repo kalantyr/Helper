@@ -86,6 +86,9 @@ namespace Helper.UserControls
 
         private void OnTtimer(object sender, ElapsedEventArgs e)
         {
+            if (Project?.AllCheckers == null)
+                return;
+
             var tasks = new List<Task>();
 
             foreach (var checker in Project.AllCheckers.OrderBy(ch => _rand.Next(Project.AllCheckers.Count)))
@@ -113,7 +116,10 @@ namespace Helper.UserControls
         private void TuneControls()
         {
             if (Project == null)
+            {
+                _lb.ItemsSource = null;
                 return;
+            }
 
             var checkerControls = Project.AllCheckers
                 .OrderBy(ch => ch.Name)

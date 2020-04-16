@@ -26,12 +26,10 @@ namespace Helper
             };
         }
 
-        private async void OnProjectChanged(object sender, EventArgs e)
+        private void OnProjectChanged(object sender, EventArgs e)
         {
             _checkers.Project = Project;
-
-            foreach (var job in Project.AllJobs)
-                await job.Run(CancellationToken.None);
+            _jobs.Project = Project;
         }
 
         private void OnExitClick(object sender, RoutedEventArgs e)

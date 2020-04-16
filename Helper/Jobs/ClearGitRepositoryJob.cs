@@ -3,7 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Helper.Checkers;
 using LibGit2Sharp;
+using Newtonsoft.Json;
 
 namespace Helper.Jobs
 {
@@ -20,14 +22,30 @@ namespace Helper.Jobs
 
         public string Password { get; set; }
 
-        private string RepositoryFolder
+        [JsonIgnore]
+        public ICheckerHistory History { get; }
+
+        private string RepositoryFolder => Path.Combine(App.TempFolder, "git", Name);
+
+        [JsonIgnore]
+        public string Name
         {
             get
             {
+                if (Url == null)
+                    return "Url == null";
+
                 var repoName = Url.Split('/').Last();
-                repoName = repoName.Replace(".git", string.Empty);
-                return Path.Combine(App.TempFolder, "git", repoName);
+                if (string.IsNullOrEmpty(repoName))
+                    return "repoName not found";
+
+                return repoName.Replace(".git", string.Empty);
             }
+        }
+
+        public ClearGitRepositoryJob()
+        {
+            History = new CheckerHistory();
         }
 
         public async Task Run(CancellationToken cancellationToken)
@@ -54,11 +72,12 @@ namespace Helper.Jobs
                         repository.Network.Push(remote, ":" + branch.UpstreamBranchCanonicalName, options);
                     }
                 }
+
+                History.AddResult(DateTime.Now, true);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                throw;
+                History.AddResult(DateTime.Now, e);
             }
         }
 

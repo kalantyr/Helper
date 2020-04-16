@@ -52,7 +52,8 @@ namespace Helper
             {
                 ClearGitRepositoryJobs = new[]
                 {
-                    new ClearGitRepositoryJob { Url = "https://github.com/kalantyr/Art.git", UserName = "userName", Password = "password" }
+                    new ClearGitRepositoryJob { Url = "https://github.com/kalantyr/Art.git", UserName = "userName", Password = "password" },
+                    new ClearGitRepositoryJob { Url = "https://github.com/neowutran/ShinraMeter.git", UserName = "userName", Password = "password" }
                 }
             };
 
