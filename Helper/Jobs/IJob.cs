@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Helper.Checkers;
 
@@ -9,6 +10,8 @@ namespace Helper.Jobs
         string Name { get; }
 
         ICheckerHistory History { get; }
+
+        Action<IJob, string> Message { get; set; }
 
         Task Run(CancellationToken cancellationToken);
     }

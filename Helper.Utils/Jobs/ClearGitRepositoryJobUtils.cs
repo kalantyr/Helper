@@ -31,8 +31,14 @@ namespace Helper.Utils.Jobs
                 var parts2 = part.Split('-', '_', '.');
                 foreach (var part2 in parts2)
                     if (part2.Length > 2)
+                    {
+                        if (BranchStopWords.Contains(part2))
+                            if (!part.StartsWith(part2))
+                                continue;
+
                         if (!words.Contains(part2))
                             words.Add(part2);
+                    }
             }
 
             if (words.Any() && words.TrueForAll(w => BranchStopWords.Any(w.StartsWith)))

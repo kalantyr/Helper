@@ -26,6 +26,12 @@ namespace Helper.UserControls
                 if (_job != null)
                 {
                     _job.History.Changed += HistoryChanged;
+
+                    _job.Message = (job, message) =>
+                    {
+                        MessageBox.Show(message, job.Name, MessageBoxButton.OK);
+                    };
+
                     if (_job is ClearGitRepositoryJob gitRepositoryJob)
                         gitRepositoryJob.GetCredentials = OnGetCredentials;
                 }

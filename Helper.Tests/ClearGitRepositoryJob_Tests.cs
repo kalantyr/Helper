@@ -22,7 +22,9 @@ namespace Helper.Tests
         [TestCase("refs/remotes/origin/clients/task/master/325128_nuget", false)]
         [TestCase("refs/remotes/origin/lead/ou/bug/315608/master", false)]
         [TestCase("refs/remotes/origin/Branch_release/13.2/#oleg", false)]
+        [TestCase("refs/remotes/origin/fp_master", false)]
         [TestCase("refs/remotes/origin/FP_11.5", false)]
+        [TestCase("refs/remotes/origin/fp/tickets/rigths_336975", false)]
         public void SkipBranchByName_Test(string branchName, bool skip)
         {
             Assert.AreEqual(skip, ClearGitRepositoryJobUtils.SkipBranchByName(branchName));

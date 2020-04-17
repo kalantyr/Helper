@@ -15,15 +15,11 @@ namespace Helper.Jobs
 {
     public class ClearGitRepositoryJob : IJob
     {
-        private const int RemoveOlderThanDays = 90;
+        private const int RemoveOlderThanDays = 60;
 
         private static readonly IDictionary<string, Credentials> CredentialsCache = new ConcurrentDictionary<string, Credentials>();
 
         public string Url { get; set; }
-
-        private string UserName { get; set; }
-
-        private string Password { get; set; }
 
         private string RepositoryHost
         {
@@ -39,6 +35,8 @@ namespace Helper.Jobs
 
         [JsonIgnore]
         public ICheckerHistory History { get; }
+
+        public Action<IJob, string> Message { get; set; }
 
         private string RepositoryFolder => Path.Combine(App.TempFolder, "git", Name);
 
@@ -73,6 +71,8 @@ namespace Helper.Jobs
             {
                 CloneOrFetch();
 
+                var successCount = 0;
+
                 var options = new PushOptions
                 {
                     CredentialsProvider = CredentialsHandler,
@@ -89,24 +89,27 @@ namespace Helper.Jobs
                         .OrderBy(GetLastCommitDate)
                         .ToArray();
 
+                    Message?.Invoke(this, "Найдено веток для удаления: " + forRemove.Length);
                     foreach (var branch in forRemove)
                         try
                         {
                             repository.Network.Push(remote, ":" + branch.UpstreamBranchCanonicalName, options);
+                            successCount++;
                             if (LastPushError != null)
                             {
+                                successCount--;
                                 if (LastPushError.Message.Contains("You need to have 'ForcePush'"))
                                     continue;
                                 throw new Exception(LastPushError.Message);
                             }
-                            else
-                                Equals(null);
                         }
                         finally
                         {
                             LastPushError = null;
                         }
                 }
+
+                Message?.Invoke(this, "Удалено веток: " + successCount);
 
                 History.AddResult(DateTime.Now, true);
             }
