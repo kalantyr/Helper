@@ -10,10 +10,17 @@
         </Style>
     </UserControl.Resources>
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
         <StackPanel Orientation="Horizontal">
             <TextBlock x:Name="_tbName" MinWidth="200"/>
             <Button Content="Run now" Click="OnRunClick" />
             <Button Content="History..." Click="OnHistoryClick"/>
         </StackPanel>
+
+        <TextBlock x:Name="_tbMessage" Grid.Row="1"/>
     </Grid>
 </UserControl>

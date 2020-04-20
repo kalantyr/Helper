@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -27,10 +28,10 @@ namespace Helper.UserControls
                 {
                     _job.History.Changed += HistoryChanged;
 
-                    _job.Message = (job, message) =>
-                    {
-                        MessageBox.Show(message, job.Name, MessageBoxButton.OK);
-                    };
+                    //_job.Message = (job, message) =>
+                    //{
+                    //    MessageBox.Show(message, job.Name, MessageBoxButton.OK);
+                    //};
 
                     if (_job is ClearGitRepositoryJob gitRepositoryJob)
                         gitRepositoryJob.GetCredentials = OnGetCredentials;
@@ -42,6 +43,9 @@ namespace Helper.UserControls
 
         private Credentials OnGetCredentials(string s)
         {
+            if (!Dispatcher.CheckAccess())
+                return Dispatcher.Invoke(() => OnGetCredentials(s));
+
             var window = new GitCredentialsWindow(s) { Owner = App.GetWindow(this) };
             return window.ShowDialog() == true
                 ? window.Credentials
@@ -65,12 +69,22 @@ namespace Helper.UserControls
 
         private void TuneControls()
         {
-            var brush = GetBackground(Job?.History.LastValue);
+            var lastValue = Job?.History.LastValue;
+
+            var brush = GetBackground(lastValue);
             Background = brush;
 
             _tbName.Text = Job != null
                 ? Job.Name
                 : "-";
+
+            if (lastValue is Exception error)
+            {
+                _tbMessage.Visibility = Visibility.Visible;
+                _tbMessage.Text = error.GetBaseException().Message;
+            }
+            else
+                _tbMessage.Visibility = Visibility.Collapsed;
         }
 
         private async void OnRunClick(object sender, RoutedEventArgs e)
@@ -91,18 +105,19 @@ namespace Helper.UserControls
 
         private void OnHistoryClick(object sender, RoutedEventArgs e)
         {
-            if (Job.History.LastValue is Exception error)
-            {
-                MessageBox.Show(error.GetBaseException().ToString(), "Exception", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
             var lastValues = Job.History.Values
                 .OrderByDescending(v => v.Key)
                 .Take(50);
-            var text = string.Join(Environment.NewLine,
-                lastValues.Select(v => $"{v.Key:hh:mm:ss} - {v.Value}"));
+            var text = string.Join(Environment.NewLine, lastValues.Select(ToString));
             MessageBox.Show(text, "History", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private static string ToString(KeyValuePair<DateTime, object> v)
+        {
+            if (v.Value is Exception error)
+                return $"{v.Key:hh:mm:ss} - {error.GetBaseException().Message}";
+
+            return $"{v.Key:hh:mm:ss} - {v.Value}";
         }
     }
 }

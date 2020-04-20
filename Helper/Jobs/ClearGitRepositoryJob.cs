@@ -17,6 +17,8 @@ namespace Helper.Jobs
     {
         private const int RemoveOlderThanDays = 60;
 
+        private volatile bool _inProcess;
+
         private static readonly IDictionary<string, Credentials> CredentialsCache = new ConcurrentDictionary<string, Credentials>();
 
         public string Url { get; set; }
@@ -33,9 +35,12 @@ namespace Helper.Jobs
             }
         }
 
+        public TimeSpan? Interval => TimeSpan.FromHours(12);
+
         [JsonIgnore]
         public ICheckerHistory History { get; }
 
+        [JsonIgnore]
         public Action<IJob, string> Message { get; set; }
 
         private string RepositoryFolder => Path.Combine(App.TempFolder, "git", Name);
@@ -56,6 +61,9 @@ namespace Helper.Jobs
             }
         }
 
+        public bool IsDisabled { get; set; }
+
+        [JsonIgnore]
         public Func<string, Credentials> GetCredentials;
 
         private PushStatusError LastPushError { get; set; }
@@ -69,6 +77,11 @@ namespace Helper.Jobs
         {
             try
             {
+                if (_inProcess)
+                    return;
+
+                _inProcess = true;
+
                 CloneOrFetch();
 
                 var successCount = 0;
@@ -115,7 +128,16 @@ namespace Helper.Jobs
             }
             catch (Exception e)
             {
+                if (e.Message.Contains("too many redirects or authentication replays",
+                    StringComparison.InvariantCultureIgnoreCase))
+                    if (CredentialsCache.ContainsKey(RepositoryHost))
+                        CredentialsCache.Remove(RepositoryHost);
+
                 History.AddResult(DateTime.Now, e);
+            }
+            finally
+            {
+                _inProcess = false;
             }
         }
 

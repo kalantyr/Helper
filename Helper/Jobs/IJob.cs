@@ -9,6 +9,10 @@ namespace Helper.Jobs
     {
         string Name { get; }
 
+        bool IsDisabled { get; }
+
+        TimeSpan? Interval { get; }
+
         ICheckerHistory History { get; }
 
         Action<IJob, string> Message { get; set; }
