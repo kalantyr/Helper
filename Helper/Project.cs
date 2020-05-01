@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Helper.Checkers;
 using Helper.Jobs;
 using Newtonsoft.Json;
@@ -15,7 +16,16 @@ namespace Helper
         });
 
         [JsonIgnore]
-        public IReadOnlyCollection<IChecker> AllCheckers => Checkers.ChatAvailableCheckers;
+        public IReadOnlyCollection<IChecker> AllCheckers
+        {
+            get
+            {
+                var list = new List<IChecker>();
+                //list.AddRange(Checkers.ChatAvailableCheckers);
+                list.AddRange(Checkers.BngCheckers);
+                return list;
+            }
+        }
 
         [JsonIgnore]
         public IReadOnlyCollection<IJob> AllJobs => Jobs.ClearGitRepositoryJobs;
@@ -30,7 +40,8 @@ namespace Helper
 
             Checkers = new AllCheckers
             {
-                ChatAvailableCheckers = new ChatAvailableChecker[0]
+                ChatAvailableCheckers = new ChatAvailableChecker[0],
+                BngCheckers = new BngChecker[0]
             };
             Jobs = new AllJobs
             {
@@ -66,6 +77,8 @@ namespace Helper
     public class AllCheckers
     {
         public ChatAvailableChecker[] ChatAvailableCheckers { get; set; }
+
+        public BngChecker[] BngCheckers { get; set; }
     }
 
     public class AllJobs

@@ -1,108 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using Newtonsoft.Json;
 
 namespace Helper.Checkers
 {
-    public class ChatAvailableChecker: IChecker, IDisposable
+    public class ChatAvailableChecker: HttpCheckerBase
     {
         private const int PrevCount = 3;
 
-        private readonly HttpClient _httpClient;
-
-        private volatile bool _checkInProcess;
         private readonly Queue<string> _prevTexts = new Queue<string>();
 
-        [JsonIgnore]
-        public string Name
+        protected override HttpRequestMessage CreateRequest()
         {
-            get
-            {
-                var uri = new Uri(Address);
-                return uri.AbsolutePath.Trim('/');
-            }
-        }
-
-        public bool IsDisabled { get; set; }
-
-        public TimeSpan? Interval => null;
-
-        public string Address { get; set; }
-
-        [JsonIgnore]
-        public ICheckerHistory History { get; }
-
-        public void CopyToClipboard()
-        {
-            Clipboard.SetText(Address);
-        }
-
-        [JsonIgnore]
-        public EventHandler Notify { get; set; }
-        
-        public bool NeedNotify { get; set; }
-
-        public ChatAvailableChecker()
-        {
-            var handler = new HttpClientHandler { UseDefaultCredentials = true };
-            _httpClient = new HttpClient(handler, true);
-
-            History = new CheckerHistory();
-        }
-
-        public async Task Check(CancellationToken cancellationToken)
-        {
-            if (_checkInProcess)
-                return;
-
-            try
-            {
-                _checkInProcess = true;
-
-                using var request = CreateRequest();
-                var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead,
-                    cancellationToken);
-                response.EnsureSuccessStatusCode();
-
-                var text = await response.Content.ReadAsStringAsync();
-
-                var lastResult = (bool?) History.LastValue;
-
-                var available = !string.IsNullOrWhiteSpace(text);
-                if (available)
-                    if (_prevTexts.Count > 1 && _prevTexts.All(t => t == text))
-                        available = false;
-
-                History.AddResult(DateTime.Now, available);
-
-                if (lastResult == false && available)
-                    if (NeedNotify)
-                        Notify?.Invoke(this, EventArgs.Empty);
-
-                _prevTexts.Enqueue(text);
-                if (_prevTexts.Count > PrevCount)
-                    _prevTexts.Dequeue();
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-                History.AddResult(DateTime.Now, false);
-            }
-            finally
-            {
-                _checkInProcess = false;
-            }
-        }
-
-        private HttpRequestMessage CreateRequest()
-        {
-            var headers = @"
+            const string headers = @"
                 :method: GET
                 :scheme: https
                 accept: */*
@@ -134,9 +46,20 @@ namespace Helper.Checkers
             return request;
         }
 
-        public void Dispose()
+        protected override async Task<bool> IsAvailable(HttpResponseMessage response)
         {
-            _httpClient?.Dispose();
+            var text = await response.Content.ReadAsStringAsync();
+
+            var available = !string.IsNullOrWhiteSpace(text);
+            if (available)
+                if (_prevTexts.Count > 1 && _prevTexts.All(t => t == text))
+                    available = false;
+
+            _prevTexts.Enqueue(text);
+            if (_prevTexts.Count > PrevCount)
+                _prevTexts.Dequeue();
+
+            return available;
         }
     }
 }
