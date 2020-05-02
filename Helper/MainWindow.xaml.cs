@@ -1,7 +1,10 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Windows;
+using Helper.Tools;
 using Helper.Utils;
+using Helper.Windows;
 using Microsoft.Win32;
 using Size = System.Windows.Size;
 
@@ -97,6 +100,14 @@ namespace Helper
         private void OnNewClick(object sender, RoutedEventArgs e)
         {
             ((App)Application.Current).NewProject();
+        }
+
+        private async void OnRemoveProjectsClick(object sender, RoutedEventArgs e)
+        {
+            var tool = new RemoveUnusedProjectsTool();
+            var window = new RemoveUnusedProjectsToolWindow(tool) { Owner = this };
+            if (window.ShowDialog() == true)
+                await tool.Run(CancellationToken.None);
         }
     }
 }

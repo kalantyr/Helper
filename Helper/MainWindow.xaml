@@ -10,12 +10,15 @@
         </Grid.RowDefinitions>
 
         <Menu>
-            <MenuItem Header="Файл">
-                <MenuItem Header="Создать..." Click="OnNewClick"/>
-                <MenuItem Header="Загрузить..." Click="OnLoadClick"/>
-                <MenuItem Header="Сохранить..." Click="OnSaveClick"/>
+            <MenuItem Header="File">
+                <MenuItem Header="New" Click="OnNewClick"/>
+                <MenuItem Header="Load..." Click="OnLoadClick"/>
+                <MenuItem Header="Save..." Click="OnSaveClick"/>
                 <Separator/>
-                <MenuItem Header="Выход" Click="OnExitClick"/>
+                <MenuItem Header="Exit" Click="OnExitClick"/>
+            </MenuItem>
+            <MenuItem Header="Tools">
+                <MenuItem Header="Remove unused projects from solution..." Click="OnRemoveProjectsClick"/>
             </MenuItem>
         </Menu>
 
