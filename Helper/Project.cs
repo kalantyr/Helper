@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Helper.Checkers;
 using Helper.Jobs;
 using Newtonsoft.Json;
@@ -21,7 +20,7 @@ namespace Helper
             get
             {
                 var list = new List<IChecker>();
-                //list.AddRange(Checkers.ChatAvailableCheckers);
+                list.AddRange(Checkers.ChatAvailableCheckers);
                 list.AddRange(Checkers.BngCheckers);
                 return list;
             }
