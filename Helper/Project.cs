@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Helper.Checkers;
 using Helper.Jobs;
 using Newtonsoft.Json;
@@ -13,6 +15,8 @@ namespace Helper
             Formatting = Formatting.Indented,
             DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate
         });
+
+        public event Action<Project, IChecker> CheckerRemoved;
 
         [JsonIgnore]
         public IReadOnlyCollection<IChecker> AllCheckers
@@ -35,7 +39,7 @@ namespace Helper
 
         public Project()
         {
-            const string gitHost = "http://tfs4alm10v:8080/tfs/TFS2005%20-%20upgraded%20Projects/CustomerPortal/_git/";
+            //const string gitHost = "http://tfs4alm10v:8080/tfs/TFS2005%20-%20upgraded%20Projects/CustomerPortal/_git/";
 
             Checkers = new AllCheckers
             {
@@ -44,6 +48,8 @@ namespace Helper
             };
             Jobs = new AllJobs
             {
+                ClearGitRepositoryJobs = new ClearGitRepositoryJob[0]
+                /*
                 ClearGitRepositoryJobs = new[]
                 {
                     new ClearGitRepositoryJob { Url = gitHost + "nuget-logs" },
@@ -56,6 +62,7 @@ namespace Helper
                     new ClearGitRepositoryJob { Url = gitHost + "Vtb.WebServices.AuthService" },
                     new ClearGitRepositoryJob { Url = gitHost + "v6.backend.integration.api" }
                 }
+                */
             };
         }
 
@@ -70,6 +77,27 @@ namespace Helper
             using var reader = new StreamReader(stream);
             using var jsonReader = new JsonTextReader(reader);
             return JsonSerializer.Deserialize<Project>(jsonReader);
+        }
+
+        public void Remove(IChecker checker)
+        {
+            if (checker == null) throw new ArgumentNullException(nameof(checker));
+
+            if (Checkers.BngCheckers.Contains(checker))
+            {
+                Checkers.BngCheckers = Checkers.BngCheckers.Where(ch => ch != checker).ToArray();
+                CheckerRemoved?.Invoke(this, checker);
+                return;
+            }
+
+            if (Checkers.ChatAvailableCheckers.Contains(checker))
+            {
+                Checkers.ChatAvailableCheckers = Checkers.ChatAvailableCheckers.Where(ch => ch != checker).ToArray();
+                CheckerRemoved?.Invoke(this, checker);
+                return;
+            }
+
+            throw new NotImplementedException();
         }
     }
 

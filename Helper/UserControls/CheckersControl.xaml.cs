@@ -32,7 +32,14 @@ namespace Helper.UserControls
 
                 foreach (var checker in _project.AllCheckers)
                     checker.Notify += OnNotify;
+
+                _project.CheckerRemoved += OnCheckerRemoved;
             }
+        }
+
+        private void OnCheckerRemoved(Project prj, IChecker ch)
+        {
+            TuneControls();
         }
 
         private void OnNotify(object sender, EventArgs e)

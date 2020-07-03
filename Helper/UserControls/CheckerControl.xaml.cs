@@ -90,5 +90,14 @@ namespace Helper.UserControls
                 lastValues.Select(v => $"{v.Key:hh:mm:ss} - {v.Value}"));
             MessageBox.Show(text, "History", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
+        private void OnRemoveClick(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show($"Remove item {Checker.Name}?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Yes) != MessageBoxResult.Yes)
+                return;
+
+            var project = ((App)Application.Current).Project;
+            project.Remove(Checker);
+        }
     }
 }

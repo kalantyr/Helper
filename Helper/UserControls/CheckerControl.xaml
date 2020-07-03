@@ -11,10 +11,17 @@
     </UserControl.Resources>
     <Grid>
         <StackPanel Orientation="Horizontal">
+            <StackPanel.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Copy address" Click="OnCopyClick"/>
+                    <Separator></Separator>
+                    <MenuItem Header="Check now" Click="OnRefreshClick"/>
+                    <MenuItem Header="History..." Click="OnHistoryClick"/>
+                    <Separator></Separator>
+                    <MenuItem Header="Remove" Click="OnRemoveClick"/>
+                </ContextMenu>
+            </StackPanel.ContextMenu>
             <TextBlock x:Name="_tbName" MinWidth="200"/>
-            <Button Content="Check now" Click="OnRefreshClick" />
-            <Button Content="Copy" Click="OnCopyClick"/>
-            <Button Content="History..." Click="OnHistoryClick"/>
         </StackPanel>
     </Grid>
 </UserControl>
