@@ -2,7 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+
+[assembly:InternalsVisibleTo("Helper.Tests")]
 
 namespace Helper.Checkers
 {
@@ -43,20 +48,50 @@ namespace Helper.Checkers
             return request;
         }
 
-        protected override async Task<bool> IsAvailable(HttpResponseMessage response)
+        protected override async Task<bool> IsAvailable(HttpResponseMessage response, CancellationToken cancellationToken)
         {
             var text = await response.Content.ReadAsStringAsync();
 
             var available = !string.IsNullOrWhiteSpace(text);
+
             if (available)
+            {
                 if (_prevTexts.Count > 1 && _prevTexts.All(t => t == text))
                     available = false;
+                if (available)
+                {
+                    using var request = new HttpRequestMessage(HttpMethod.Get, Address);
+                    var html = await SendAsync(request, cancellationToken);
+                    text = await html.Content.ReadAsStringAsync();
+                    var s = GetLastBroadcastText(text);
+                    if (s.Contains("minut"))
+                        available = false;
+                }
+            }
 
             _prevTexts.Enqueue(text);
             if (_prevTexts.Count > PrevCount)
                 _prevTexts.Dequeue();
 
             return available;
+        }
+
+        internal static string GetLastBroadcastText(string text)
+        {
+            var i1 = text.IndexOf("Last Broadcast", StringComparison.InvariantCulture);
+            if (i1 < 0)
+                return null;
+
+            var i2 = text.Substring(0, i1).LastIndexOf("<div class=\"attribute\">", StringComparison.InvariantCulture);
+
+            const string div = "</div>";
+            var i3 = i2;
+            for (var i = 0; i < 3; i++)
+                i3 += text.Substring(i3).IndexOf(div, StringComparison.InvariantCulture) + div.Length;
+    
+            var s = text.Substring(i2, i3 - i2);
+            var xml = XElement.Parse(s);
+            return xml.Elements().ToArray()[1].Value;
         }
     }
 }

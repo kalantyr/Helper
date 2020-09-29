@@ -1,0 +1,5 @@
+﻿<UserControl x:Class="Helper.UserControls.EventControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <TextBlock x:Name="_tbName"/>
+</UserControl>

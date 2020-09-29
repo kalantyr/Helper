@@ -61,12 +61,11 @@ namespace Helper.Checkers
                 _checkInProcess = true;
 
                 using var request = CreateRequest();
-                var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
-                response.EnsureSuccessStatusCode();
+                var response = await SendAsync(request, cancellationToken);
 
                 var lastResult = (bool?)History.LastValue;
 
-                var available = await IsAvailable(response);
+                var available = await IsAvailable(response, cancellationToken);
                 History.AddResult(DateTime.Now, available);
 
                 if (lastResult == false && available)
@@ -84,9 +83,16 @@ namespace Helper.Checkers
             }
         }
 
+        internal async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
+            return response;
+        }
+
         protected abstract HttpRequestMessage CreateRequest();
 
-        protected abstract Task<bool> IsAvailable(HttpResponseMessage response);
+        protected abstract Task<bool> IsAvailable(HttpResponseMessage response, CancellationToken cancellationToken);
 
         public void Dispose()
         {

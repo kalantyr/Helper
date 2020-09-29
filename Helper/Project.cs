@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Helper.Checkers;
+using Helper.Events;
 using Helper.Jobs;
 using Newtonsoft.Json;
 
@@ -33,9 +34,14 @@ namespace Helper
         [JsonIgnore]
         public IReadOnlyCollection<IJob> AllJobs => Jobs.ClearGitRepositoryJobs;
 
+        [JsonIgnore]
+        public IReadOnlyCollection<IEvent> AllEvents => Events.TimeEvents;
+
         public AllCheckers Checkers { get; set; }
 
         public AllJobs Jobs { get; set; }
+
+        public AllEvents Events { get; set; }
 
         public Project()
         {
@@ -64,6 +70,13 @@ namespace Helper
                 }
                 */
             };
+            Events = new AllEvents
+            {
+                TimeEvents = new []
+                {
+                    new TimeEvent { Name = "Test", WarningPeriod = TimeSpan.FromMinutes(5) },
+                }
+            };
         }
 
         public void Save(Stream stream)
@@ -76,7 +89,18 @@ namespace Helper
         {
             using var reader = new StreamReader(stream);
             using var jsonReader = new JsonTextReader(reader);
-            return JsonSerializer.Deserialize<Project>(jsonReader);
+            var project = JsonSerializer.Deserialize<Project>(jsonReader);
+
+            if (project.Events == null)
+                project.Events = new AllEvents
+                {
+                    TimeEvents = new[]
+                    {
+                        new TimeEvent { Name = "Test", WarningPeriod = TimeSpan.FromMinutes(5) }
+                    }
+                };
+
+            return project;
         }
 
         public void Remove(IChecker checker)
@@ -111,5 +135,10 @@ namespace Helper
     public class AllJobs
     {
         public ClearGitRepositoryJob[] ClearGitRepositoryJobs { get; set; }
+    }
+
+    public class AllEvents
+    {
+        public TimeEvent[] TimeEvents { get; set; }
     }
 }

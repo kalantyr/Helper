@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Helper.Checkers
@@ -39,7 +40,7 @@ namespace Helper.Checkers
             return request;
         }
 
-        protected override async Task<bool> IsAvailable(HttpResponseMessage response)
+        protected override async Task<bool> IsAvailable(HttpResponseMessage response, CancellationToken cancellationToken)
         {
             var text = await response.Content.ReadAsStringAsync();
             return !text.Contains("class=\"badge_online __hidden\"");

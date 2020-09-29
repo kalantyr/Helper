@@ -52,6 +52,7 @@ namespace Helper
         private void OnProjectChanged(object sender, EventArgs e)
         {
             _checkers.Project = Project;
+            _events.Project = Project;
             _jobs.Project = Project;
         }
 
