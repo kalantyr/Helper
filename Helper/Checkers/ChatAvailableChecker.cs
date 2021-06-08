@@ -64,7 +64,7 @@ namespace Helper.Checkers
                     var html = await SendAsync(request, cancellationToken);
                     text = await html.Content.ReadAsStringAsync();
                     var s = GetLastBroadcastText(text);
-                    if (s.Contains("minut"))
+                    if (s == null || s.Contains("minut") || s.Contains(" ago"))
                         available = false;
                 }
             }

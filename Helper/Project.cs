@@ -32,7 +32,15 @@ namespace Helper
         }
 
         [JsonIgnore]
-        public IReadOnlyCollection<IJob> AllJobs => Jobs.ClearGitRepositoryJobs;
+        public IReadOnlyCollection<IJob> AllJobs
+        {
+            get
+            {
+                return Jobs != null
+                    ? Jobs.ClearGitRepositoryJobs
+                    : new IJob[0];
+            }
+        }
 
         [JsonIgnore]
         public IReadOnlyCollection<IEvent> AllEvents => Events.TimeEvents;
