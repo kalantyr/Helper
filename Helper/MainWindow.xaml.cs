@@ -72,7 +72,10 @@ namespace Helper
         private void Load(string fileName)
         {
             using var file = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                ((App) Application.Current).LoadProject(file);
+            ((App)Application.Current).LoadProject(file);
+
+            Settings.Default.LastProjectFile = fileName;
+            Settings.Default.Save();
         }
 
         private void OnSaveClick(object sender, RoutedEventArgs e)

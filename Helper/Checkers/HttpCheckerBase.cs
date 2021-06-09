@@ -42,6 +42,8 @@ namespace Helper.Checkers
         public EventHandler Notify { get; set; }
 
         public bool NeedNotify { get; set; }
+        
+        public event Action<IChecker> NotFound;
 
         protected HttpCheckerBase()
         {
@@ -74,8 +76,13 @@ namespace Helper.Checkers
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e);
-                History.AddResult(DateTime.Now, false);
+                if (e.GetBaseException().Message.Contains("404"))
+                    NotFound?.Invoke(this);
+                else
+                {
+                    Debug.WriteLine(e);
+                    History.AddResult(DateTime.Now, false);
+                }
             }
             finally
             {

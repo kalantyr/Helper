@@ -21,5 +21,7 @@ namespace Helper.Checkers
         EventHandler Notify { get; set; }
 
         bool NeedNotify { get; }
+
+        event Action<IChecker> NotFound;
     }
 }

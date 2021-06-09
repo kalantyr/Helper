@@ -30,10 +30,19 @@ namespace Helper.UserControls
                 _project = value;
                 TuneControls();
 
-                foreach (var checker in _project.AllCheckers)
-                    checker.Notify += OnNotify;
+                if (_project != null)
+                {
+                    foreach (var checker in _project.AllCheckers)
+                    {
+                        checker.Notify += OnNotify;
+                        checker.NotFound += ch =>
+                        {
+                            _project.Remove(ch);
+                        };
+                    }
 
-                _project.CheckerRemoved += OnCheckerRemoved;
+                    _project.CheckerRemoved += OnCheckerRemoved;
+                }
             }
         }
 
