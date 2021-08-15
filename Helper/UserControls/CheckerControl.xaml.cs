@@ -56,6 +56,27 @@ namespace Helper.UserControls
             _tbName.Text = Checker != null
                 ? Checker.Name
                 : "-";
+
+            var lastCheckResult = Checker?.History.LastValue as bool?;
+            if (lastCheckResult != true)
+            {
+                var lastDate = Checker?.LastAvailableTime;
+                if (lastDate != null)
+                {
+                    var elapsed = DateTime.Now - lastDate.Value;
+                    if (elapsed.TotalHours < 1)
+                        _tbLastTime.Text = $"{Math.Round(elapsed.TotalMinutes)} мин. назад";
+                    else
+                        if (elapsed.TotalDays < 1)
+                            _tbLastTime.Text = $"{Math.Round(elapsed.TotalHours)} ч. назад";
+                        else
+                            _tbLastTime.Text = $"{Math.Round(elapsed.TotalDays)} дн. назад";
+                }
+                else
+                    _tbLastTime.Text = "?";
+            }
+            else
+                _tbLastTime.Text = null;
         }
 
         private static SolidColorBrush GetBackground(object lastCheckResult)

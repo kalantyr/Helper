@@ -22,6 +22,8 @@ namespace Helper.Checkers
 
         bool NeedNotify { get; }
 
+        DateTime? LastAvailableTime { get; }
+
         event Action<IChecker> NotFound;
     }
 }

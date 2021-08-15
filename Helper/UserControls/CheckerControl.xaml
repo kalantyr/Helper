@@ -22,6 +22,7 @@
                 </ContextMenu>
             </StackPanel.ContextMenu>
             <TextBlock x:Name="_tbName" MinWidth="200"/>
+            <TextBlock x:Name="_tbLastTime" MinWidth="200" Opacity="0.5"/>
         </StackPanel>
     </Grid>
 </UserControl>
