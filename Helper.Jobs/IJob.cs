@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Helper.Checkers;
 
 namespace Helper.Jobs
 {
@@ -13,7 +12,7 @@ namespace Helper.Jobs
 
         TimeSpan? Interval { get; }
 
-        ICheckerHistory History { get; }
+        IHistory History { get; }
 
         Action<IJob, string> Message { get; set; }
 

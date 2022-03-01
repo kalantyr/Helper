@@ -65,7 +65,7 @@ namespace Helper.UserControls
 
         private void OnTtimer(object sender, ElapsedEventArgs e)
         {
-            if (Project?.AllCheckers == null)
+            if (Project?.AllJobs == null)
                 return;
 
             var tasks = new List<Task>();

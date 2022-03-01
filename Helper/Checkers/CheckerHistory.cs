@@ -3,20 +3,17 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Helper.Jobs;
 
 namespace Helper.Checkers
 {
-    public interface ICheckerHistory
+    public interface ICheckerHistory : IHistory
     {
         void AddResult(DateTime dateTime, object value);
 
         EventHandler Changed { get; set; }
 
         object LastValue { get; }
-
-        DateTime? LastTime { get; }
-
-        IReadOnlyDictionary<DateTime, object> Values { get; }
     }
 
     public class CheckerHistory : ICheckerHistory

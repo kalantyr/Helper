@@ -138,7 +138,7 @@ namespace Helper.UserControls
             }
 
             var checkerControls = Project.AllCheckers
-                .OrderBy(ch => ch.Name)
+                .OrderByDescending(ch => ch.Name)
                 .Select(ch => new CheckerControl { Checker = ch })
                 .ToArray();
             _lb.ItemsSource = checkerControls;

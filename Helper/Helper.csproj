@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Helper.Jobs\Helper.Jobs.csproj" />
     <ProjectReference Include="..\Helper.Utils\Helper.Utils.csproj" />
   </ItemGroup>
 

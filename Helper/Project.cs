@@ -5,6 +5,7 @@ using System.Linq;
 using Helper.Checkers;
 using Helper.Events;
 using Helper.Jobs;
+using Helper.Jobs.Impl;
 using Newtonsoft.Json;
 
 namespace Helper
@@ -37,8 +38,8 @@ namespace Helper
             get
             {
                 return Jobs != null
-                    ? Jobs.ClearGitRepositoryJobs
-                    : new IJob[0];
+                    ? Jobs.SyncFilesJobs
+                    : Array.Empty<IJob>();
             }
         }
 
@@ -60,29 +61,30 @@ namespace Helper
                 ChatAvailableCheckers = new ChatAvailableChecker[0],
                 BngCheckers = new BngChecker[0]
             };
-            Jobs = new AllJobs
-            {
-                ClearGitRepositoryJobs = new ClearGitRepositoryJob[0]
-                /*
-                ClearGitRepositoryJobs = new[]
-                {
-                    new ClearGitRepositoryJob { Url = gitHost + "nuget-logs" },
-                    new ClearGitRepositoryJob { Url = gitHost + "nuget-adapters" },
-                    new ClearGitRepositoryJob { Url = gitHost + "database" },
-                    new ClearGitRepositoryJob { Url = gitHost + "user-ui" },
-                    new ClearGitRepositoryJob { Url = gitHost + "support" },
-                    new ClearGitRepositoryJob { Url = gitHost + "portal" },
-                    new ClearGitRepositoryJob { Url = gitHost + "Vtb.WebServices.AuthorizationServices" },
-                    new ClearGitRepositoryJob { Url = gitHost + "Vtb.WebServices.AuthService" },
-                    new ClearGitRepositoryJob { Url = gitHost + "v6.backend.integration.api" }
-                }
-                */
-            };
+            Jobs = CreateDevJobs();
             Events = new AllEvents
             {
                 TimeEvents = new []
                 {
                     new TimeEvent { Name = "Test", WarningPeriod = TimeSpan.FromMinutes(5) },
+                }
+            };
+        }
+
+        private static AllJobs CreateDevJobs()
+        {
+            return new AllJobs
+            {
+                SyncFilesJobs = new []
+                {
+                    new SyncFilesJob
+                    {
+                        RootFolders = new []
+                        {
+                            "C:\\Users\\Kalavarda\\Мой диск",
+                            "C:\\_\\2022_03\\01\\TestShare"
+                        }
+                    }
                 }
             };
         }
@@ -99,14 +101,16 @@ namespace Helper
             using var jsonReader = new JsonTextReader(reader);
             var project = JsonSerializer.Deserialize<Project>(jsonReader);
 
-            if (project.Events == null)
-                project.Events = new AllEvents
+            project.Events ??= new AllEvents
+            {
+                TimeEvents = new[]
                 {
-                    TimeEvents = new[]
-                    {
-                        new TimeEvent { Name = "Test", WarningPeriod = TimeSpan.FromMinutes(5) }
-                    }
-                };
+                    new TimeEvent {Name = "Test", WarningPeriod = TimeSpan.FromMinutes(5)}
+                }
+            };
+
+            if (!project.AllJobs.Any())
+                project.Jobs = CreateDevJobs();
 
             return project;
         }
@@ -142,7 +146,7 @@ namespace Helper
 
     public class AllJobs
     {
-        public ClearGitRepositoryJob[] ClearGitRepositoryJobs { get; set; }
+        public SyncFilesJob[] SyncFilesJobs { get; set; } = Array.Empty<SyncFilesJob>();
     }
 
     public class AllEvents

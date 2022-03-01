@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using Helper.Jobs;
+using Helper.Jobs.Impl;
 using Helper.Windows;
 using LibGit2Sharp;
 
@@ -26,15 +27,9 @@ namespace Helper.UserControls
 
                 if (_job != null)
                 {
-                    _job.History.Changed += HistoryChanged;
-
-                    //_job.Message = (job, message) =>
-                    //{
-                    //    MessageBox.Show(message, job.Name, MessageBoxButton.OK);
-                    //};
-
-                    if (_job is ClearGitRepositoryJob gitRepositoryJob)
-                        gitRepositoryJob.GetCredentials = OnGetCredentials;
+                    if (_job is SyncFilesJob syncFilesJob)
+                    {
+                    }
                 }
 
                 TuneControls();
@@ -69,7 +64,7 @@ namespace Helper.UserControls
 
         private void TuneControls()
         {
-            var lastValue = Job?.History.LastValue;
+            object lastValue = true;
 
             var brush = GetBackground(lastValue);
             Background = brush;
