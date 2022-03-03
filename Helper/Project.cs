@@ -97,18 +97,7 @@ namespace Helper
                         Options = new EncryptFilesJob.EncryptOptions
                         {
                             SourceFolder = "C:\\Users\\Kalavarda\\Мой диск",
-                            DestFolder = "C:\\_\\2022_03\\02\\TestEncrypt",
-                            Password = "123"
-                        }
-                    },
-                    new EncryptFilesJob
-                    {
-                        Options = new EncryptFilesJob.EncryptOptions
-                        {
-                            SourceFolder = "C:\\_\\2022_03\\02\\TestEncrypt",
-                            DestFolder = "C:\\_\\2022_03\\03\\DecryptTest",
-                            Password = "123",
-                            Decrypt = true
+                            DestFolder = "C:\\Users\\Kalavarda\\YandexDisk"
                         }
                     }
                 }

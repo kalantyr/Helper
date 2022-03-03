@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Helper.Jobs.Impl
 {
@@ -9,7 +10,16 @@ namespace Helper.Jobs.Impl
 
         public IReadOnlyDictionary<DateTime, object> Values => _dictionary;
 
-        public DateTime? LastTime => DateTime.Now.AddHours(-01);
+        public DateTime? LastTime
+        {
+            get
+            {
+                if (_dictionary.Count == 0)
+                    return null;
+
+                return _dictionary.Keys.Max();
+            }
+        }
 
         public void Add(object value)
         {

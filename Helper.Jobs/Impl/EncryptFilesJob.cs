@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace Helper.Jobs.Impl
 {
-    public class EncryptFilesJob: IJob
+    public class EncryptFilesJob: IJob, INeedSettings
     {
         private readonly JobHistory _history = new JobHistory();
+        private static bool _running;
 
         public string Name => "Encrypt";
 
-        public string[] ExcludeFilters { get; } = { ".ini", ".tmp." };
+        public string[] ExcludeFilters { get; } = { ".ini", ".tmp.", ".sync" };
 
         public bool IsDisabled { get; set; }
 
@@ -26,14 +27,23 @@ namespace Helper.Jobs.Impl
 
         public async Task Run(CancellationToken cancellationToken)
         {
+            if (_running)
+                return;
+
             try
             {
-                Encrypt(new DirectoryInfo(Options.SourceFolder), new DirectoryInfo(Options.DestFolder), new CryptoEngine(Options.Password));
+                _running = true;
+                Encrypt(new DirectoryInfo(Options.SourceFolder), new DirectoryInfo(Options.DestFolder),
+                    new CryptoEngine(Settings.Password));
                 _history.Add(true);
             }
             catch (Exception e)
             {
                 _history.Add(e);
+            }
+            finally
+            {
+                _running = false;
             }
         }
 
@@ -77,9 +87,9 @@ namespace Helper.Jobs.Impl
 
             public string DestFolder { get; set; }
 
-            public string Password { get; set; }
-
             public bool Decrypt { get; set; } = false;
         }
+
+        public ISettings Settings { get; set; }
     }
 }

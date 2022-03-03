@@ -14,12 +14,13 @@ namespace Helper.Jobs.Impl
     public class SyncFilesJob: IJob
     {
         private readonly JobHistory _history = new JobHistory();
+        private static bool _running;
 
         public string Name => "Синхронизация файлов";
 
         public bool IsDisabled { get; set; }
 
-        public string[] ExcludeFilters { get; } = { ".ini", ".tmp." };
+        public string[] ExcludeFilters { get; } = { ".ini", ".tmp.", ".sync" };
 
         public bool CompareBeforeCopy { get; } = true;
         
@@ -33,10 +34,14 @@ namespace Helper.Jobs.Impl
         
         public async Task Run(CancellationToken cancellationToken)
         {
+            if (_running)
+                return;
+
             try
             {
+                _running = true;
                 var roots = RootFolders.Select(rf => new RootInfo(rf)).ToArray();
-                
+
                 var paths = GetPaths(roots);
 
                 foreach (var path in paths)
@@ -51,6 +56,10 @@ namespace Helper.Jobs.Impl
             catch (Exception e)
             {
                 _history.Add(e);
+            }
+            finally
+            {
+                _running = false;
             }
         }
 

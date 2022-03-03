@@ -16,6 +16,8 @@
                 <MenuItem Header="Load..." Click="OnLoadClick"/>
                 <MenuItem Header="Save..." Click="OnSaveClick"/>
                 <Separator/>
+                <MenuItem Header="Settings..." Click="OnSettingsClick"/>
+                <Separator/>
                 <MenuItem Header="Exit" Click="OnExitClick"/>
             </MenuItem>
             <MenuItem Header="Tools">

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows;
+using Helper.Jobs;
 using Helper.Tools;
 using Helper.Utils;
 using Helper.Windows;
@@ -54,6 +56,10 @@ namespace Helper
             _checkers.Project = Project;
             _events.Project = Project;
             _jobs.Project = Project;
+
+            var settings = new SettingsImpl();
+            foreach (var job in Project.AllJobs.OfType<INeedSettings>())
+                job.Settings = settings;
         }
 
         private void OnExitClick(object sender, RoutedEventArgs e)
@@ -112,6 +118,12 @@ namespace Helper
             var window = new RemoveUnusedProjectsToolWindow(tool) { Owner = this };
             if (window.ShowDialog() == true)
                 await tool.Run(CancellationToken.None);
+        }
+
+        private void OnSettingsClick(object sender, RoutedEventArgs e)
+        {
+            var window = new SettingsWindow { Owner = this };
+            window.ShowDialog();
         }
     }
 }
