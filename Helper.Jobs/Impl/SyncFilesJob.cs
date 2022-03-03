@@ -19,7 +19,7 @@ namespace Helper.Jobs.Impl
 
         public bool IsDisabled { get; set; }
 
-        public string[] ExcludeFilters { get; } = { ".ini" };
+        public string[] ExcludeFilters { get; } = { ".ini", ".tmp." };
 
         public bool CompareBeforeCopy { get; } = true;
         

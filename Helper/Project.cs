@@ -37,9 +37,13 @@ namespace Helper
         {
             get
             {
-                return Jobs != null
-                    ? Jobs.SyncFilesJobs
-                    : Array.Empty<IJob>();
+                var list = new List<IJob>();
+                if (Jobs != null)
+                {
+                    list.AddRange(Jobs.SyncFilesJobs);
+                    list.AddRange(Jobs.EncryptFilesJobs);
+                }
+                return list;
             }
         }
 
@@ -83,6 +87,28 @@ namespace Helper
                         {
                             "C:\\Users\\Kalavarda\\Мой диск",
                             "C:\\_\\2022_03\\01\\TestShare"
+                        }
+                    }
+                },
+                EncryptFilesJobs = new []
+                {
+                    new EncryptFilesJob
+                    {
+                        Options = new EncryptFilesJob.EncryptOptions
+                        {
+                            SourceFolder = "C:\\Users\\Kalavarda\\Мой диск",
+                            DestFolder = "C:\\_\\2022_03\\02\\TestEncrypt",
+                            Password = "123"
+                        }
+                    },
+                    new EncryptFilesJob
+                    {
+                        Options = new EncryptFilesJob.EncryptOptions
+                        {
+                            SourceFolder = "C:\\_\\2022_03\\02\\TestEncrypt",
+                            DestFolder = "C:\\_\\2022_03\\03\\DecryptTest",
+                            Password = "123",
+                            Decrypt = true
                         }
                     }
                 }
@@ -147,6 +173,8 @@ namespace Helper
     public class AllJobs
     {
         public SyncFilesJob[] SyncFilesJobs { get; set; } = Array.Empty<SyncFilesJob>();
+        
+        public EncryptFilesJob[] EncryptFilesJobs { get; set; } = Array.Empty<EncryptFilesJob>();
     }
 
     public class AllEvents
