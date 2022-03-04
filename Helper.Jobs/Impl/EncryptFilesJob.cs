@@ -33,8 +33,7 @@ namespace Helper.Jobs.Impl
             try
             {
                 _running = true;
-                Encrypt(new DirectoryInfo(Options.SourceFolder), new DirectoryInfo(Options.DestFolder),
-                    new CryptoEngine(Settings.Password));
+                Encrypt(new DirectoryInfo(Options.SourceFolder), new DirectoryInfo(Options.DestFolder), new CryptoEngine(Settings.Password));
                 _history.Add(true);
             }
             catch (Exception e)

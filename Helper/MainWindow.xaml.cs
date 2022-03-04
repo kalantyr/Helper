@@ -9,6 +9,7 @@ using Helper.Utils;
 using Helper.Windows;
 using Microsoft.Win32;
 using Size = System.Windows.Size;
+using Point = System.Drawing.Point;
 
 namespace Helper
 {
@@ -26,6 +27,12 @@ namespace Helper
                 Height = Settings.Default.MainWindowSize.Height;
             }
 
+            if (Settings.Default.MainWindowPos != Point.Empty)
+            {
+                Left = Settings.Default.MainWindowPos.X;
+                Top = Settings.Default.MainWindowPos.Y;
+            }
+
             ((App)Application.Current).ProjectChanged += OnProjectChanged;
 
             Activated += (sender, e) => WindowsUtils.StopFlash(this);
@@ -37,6 +44,16 @@ namespace Helper
             };
 
             SizeChanged += MainWindow_SizeChanged;
+            LocationChanged += MainWindow_LocationChanged;
+        }
+
+        private void MainWindow_LocationChanged(object sender, EventArgs e)
+        {
+            if (IsInitialized)
+            {
+                Settings.Default.MainWindowPos = new Point((int)Left, (int)Top);
+                Settings.Default.Save();
+            }
         }
 
         private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)

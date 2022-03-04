@@ -70,5 +70,17 @@ namespace Helper {
                 this["Password"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0, 0")]
+        public global::System.Drawing.Point MainWindowPos {
+            get {
+                return ((global::System.Drawing.Point)(this["MainWindowPos"]));
+            }
+            set {
+                this["MainWindowPos"] = value;
+            }
+        }
     }
 }
