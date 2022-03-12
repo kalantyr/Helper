@@ -3,24 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Helper.Checkers;
-using Helper.Events;
 using Helper.Jobs;
 using Helper.Jobs.Impl;
-using Newtonsoft.Json;
+using Helper.Models.Events;
+using Helper.Utils;
 
 namespace Helper
 {
     public class Project
     {
-        private static readonly JsonSerializer JsonSerializer = JsonSerializer.CreateDefault(new JsonSerializerSettings
-        {
-            Formatting = Formatting.Indented,
-            DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate
-        });
 
         public event Action<Project, IChecker> CheckerRemoved;
 
-        [JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public IReadOnlyCollection<IChecker> AllCheckers
         {
             get
@@ -32,7 +27,7 @@ namespace Helper
             }
         }
 
-        [JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public IReadOnlyCollection<IJob> AllJobs
         {
             get
@@ -47,7 +42,7 @@ namespace Helper
             }
         }
 
-        [JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public IReadOnlyCollection<IEvent> AllEvents => Events.TimeEvents;
 
         public AllCheckers Checkers { get; set; }
@@ -58,8 +53,6 @@ namespace Helper
 
         public Project()
         {
-            //const string gitHost = "http://tfs4alm10v:8080/tfs/TFS2005%20-%20upgraded%20Projects/CustomerPortal/_git/";
-
             Checkers = new AllCheckers
             {
                 ChatAvailableCheckers = new ChatAvailableChecker[0],
@@ -106,15 +99,12 @@ namespace Helper
 
         public void Save(Stream stream)
         {
-            using var writer = new StreamWriter(stream);
-                JsonSerializer.Serialize(writer, this);
+            new ProjectSerializer().Save(this, stream);
         }
 
         public static Project Load(Stream stream)
         {
-            using var reader = new StreamReader(stream);
-            using var jsonReader = new JsonTextReader(reader);
-            var project = JsonSerializer.Deserialize<Project>(jsonReader);
+            var project = new ProjectSerializer().Load(stream);
 
             project.Events ??= new AllEvents
             {
@@ -161,9 +151,32 @@ namespace Helper
 
     public class AllJobs
     {
+        public event Action<IJob> Removed;
+
         public SyncFilesJob[] SyncFilesJobs { get; set; } = Array.Empty<SyncFilesJob>();
         
         public EncryptFilesJob[] EncryptFilesJobs { get; set; } = Array.Empty<EncryptFilesJob>();
+
+        public void Remove(IJob job)
+        {
+            if (job == null) throw new ArgumentNullException(nameof(job));
+
+            if (job is SyncFilesJob syncFilesJob)
+            {
+                SyncFilesJobs = SyncFilesJobs.Remove(syncFilesJob);
+                Removed?.Invoke(job);
+                return;
+            }
+
+            if (job is EncryptFilesJob encryptFilesJob)
+            {
+                EncryptFilesJobs = EncryptFilesJobs.Remove(encryptFilesJob);
+                Removed?.Invoke(job);
+                return;
+            }
+
+            throw new NotImplementedException();
+        }
     }
 
     public class AllEvents

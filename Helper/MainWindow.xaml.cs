@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Windows;
-using Helper.Jobs;
 using Helper.Tools;
 using Helper.Utils;
 using Helper.Windows;
@@ -29,6 +27,9 @@ namespace Helper
 
             if (Settings.Default.MainWindowPos != Point.Empty)
             {
+                if (Math.Abs(Settings.Default.MainWindowPos.X) > 10000 || Math.Abs(Settings.Default.MainWindowPos.Y) > 10000)
+                    Settings.Default.MainWindowPos = new Point();
+
                 Left = Settings.Default.MainWindowPos.X;
                 Top = Settings.Default.MainWindowPos.Y;
             }
@@ -73,10 +74,6 @@ namespace Helper
             _checkers.Project = Project;
             _events.Project = Project;
             _jobs.Project = Project;
-
-            var settings = new SettingsImpl();
-            foreach (var job in Project.AllJobs.OfType<INeedSettings>())
-                job.Settings = settings;
         }
 
         private void OnExitClick(object sender, RoutedEventArgs e)

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Helper.Models;
 
 [assembly: InternalsVisibleTo("Helper.Tests")]
 
@@ -23,8 +24,14 @@ namespace Helper.Jobs.Impl
         public string[] ExcludeFilters { get; } = { ".ini", ".tmp.", ".sync" };
 
         public bool CompareBeforeCopy { get; } = true;
-        
-        public TimeSpan? Interval => TimeSpan.FromMinutes(5);
+
+        public TimeSpan? Interval => IntervalMin != null ? TimeSpan.FromMinutes(IntervalMin.Value) : default;
+
+        public int? IntervalMin
+        {
+            get;
+            set;
+        } = 5;
 
         public IHistory History => _history;
         

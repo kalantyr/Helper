@@ -3,7 +3,7 @@ using System.Linq;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
-using Helper.Events;
+using Helper.Models.Events;
 
 namespace Helper.UserControls
 {
@@ -34,7 +34,7 @@ namespace Helper.UserControls
             get
             {
                 if (_lb.SelectedItems.Count == 0)
-                    return new IEvent[0];
+                    return Array.Empty<IEvent>();
 
                 return _lb.SelectedItems
                     .Cast<EventControl>()

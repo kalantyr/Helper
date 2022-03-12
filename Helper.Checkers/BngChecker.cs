@@ -42,7 +42,7 @@ namespace Helper.Checkers
 
         protected override async Task<bool> IsAvailable(HttpResponseMessage response, CancellationToken cancellationToken)
         {
-            var text = await response.Content.ReadAsStringAsync();
+            var text = await response.Content.ReadAsStringAsync(cancellationToken);
             return !text.Contains("class=\"badge_online __hidden\"");
         }
     }

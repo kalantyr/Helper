@@ -3,10 +3,11 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Helper.Models;
 
 namespace Helper.Jobs.Impl
 {
-    public class EncryptFilesJob: IJob, INeedSettings
+    public class EncryptFilesJob: IJob
     {
         private readonly JobHistory _history = new JobHistory();
         private static bool _running;
@@ -17,7 +18,13 @@ namespace Helper.Jobs.Impl
 
         public bool IsDisabled { get; set; }
 
-        public TimeSpan? Interval => TimeSpan.FromMinutes(15);
+        public TimeSpan? Interval => IntervalMin != null ? TimeSpan.FromMinutes(IntervalMin.Value) : default;
+
+        public int? IntervalMin
+        {
+            get;
+            set;
+        } = 15;
 
         public IHistory History => _history;
 
@@ -33,7 +40,7 @@ namespace Helper.Jobs.Impl
             try
             {
                 _running = true;
-                Encrypt(new DirectoryInfo(Options.SourceFolder), new DirectoryInfo(Options.DestFolder), new CryptoEngine(Settings.Password));
+                Encrypt(new DirectoryInfo(Options.SourceFolder), new DirectoryInfo(Options.DestFolder), new CryptoEngine(Password));
                 _history.Add(true);
             }
             catch (Exception e)
@@ -89,6 +96,6 @@ namespace Helper.Jobs.Impl
             public bool Decrypt { get; set; } = false;
         }
 
-        public ISettings Settings { get; set; }
+        public string Password { get; set; }
     }
 }

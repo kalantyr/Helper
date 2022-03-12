@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using Newtonsoft.Json;
 
 namespace Helper.Checkers
 {
@@ -18,7 +14,6 @@ namespace Helper.Checkers
 
         private volatile bool _checkInProcess;
 
-        [JsonIgnore]
         public string Name
         {
             get
@@ -34,24 +29,24 @@ namespace Helper.Checkers
 
         public string Address { get; set; }
 
-        [JsonIgnore]
         public ICheckerHistory History { get; }
 
-        public void CopyToClipboard()
+        public string GetTextForClipboard()
         {
-            Clipboard.SetText(Address);
+            return Address;
         }
 
-        [JsonIgnore]
         public EventHandler Notify { get; set; }
 
         public bool NeedNotify { get; set; }
 
-        [JsonIgnore]
         public DateTime? LastAvailableTime
         {
             get
             {
+                return null;
+
+                /*
                 if (Settings.Default.LastCheckerAvailable == null)
                     return null;
 
@@ -62,6 +57,7 @@ namespace Helper.Checkers
                     .Select(ParseLastDateTime)
                     .FirstOrDefault(t => t.Item1 == key);
                 return tuple?.Item2;
+                */
             }
         }
 
@@ -75,6 +71,7 @@ namespace Helper.Checkers
 
         private static void SetLastAvailableTime(HttpRequestMessage requestMessage)
         {
+            /*
             var lines = !string.IsNullOrWhiteSpace(Settings.Default.LastCheckerAvailable)
                 ? Settings.Default.LastCheckerAvailable.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).ToList()
                 : new List<string>();
@@ -86,6 +83,7 @@ namespace Helper.Checkers
 
             Settings.Default.LastCheckerAvailable = string.Join(Environment.NewLine, lines);
             Settings.Default.Save();
+            */
         }
 
         private static string GetLastAvailableTimeKey(HttpRequestMessage message)

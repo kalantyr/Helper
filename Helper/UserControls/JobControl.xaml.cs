@@ -6,8 +6,6 @@ using System.Windows;
 using System.Windows.Media;
 using Helper.Jobs;
 using Helper.Jobs.Impl;
-using Helper.Windows;
-using LibGit2Sharp;
 
 namespace Helper.UserControls
 {
@@ -34,17 +32,6 @@ namespace Helper.UserControls
 
                 TuneControls();
             }
-        }
-
-        private Credentials OnGetCredentials(string s)
-        {
-            if (!Dispatcher.CheckAccess())
-                return Dispatcher.Invoke(() => OnGetCredentials(s));
-
-            var window = new GitCredentialsWindow(s) { Owner = App.GetWindow(this) };
-            return window.ShowDialog() == true
-                ? window.Credentials
-                : null;
         }
 
         public JobControl()

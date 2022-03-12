@@ -1,4 +1,4 @@
-﻿namespace Helper.Events
+﻿namespace Helper.Models.Events
 {
     public interface IEvent
     {

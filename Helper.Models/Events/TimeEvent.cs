@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Helper.Events
+namespace Helper.Models.Events
 {
     public class TimeEvent: IEvent
     {

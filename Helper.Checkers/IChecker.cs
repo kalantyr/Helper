@@ -16,7 +16,7 @@ namespace Helper.Checkers
 
         ICheckerHistory History { get; }
 
-        void CopyToClipboard();
+        string GetTextForClipboard();
 
         EventHandler Notify { get; set; }
 

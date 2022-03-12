@@ -1,4 +1,4 @@
-﻿using Helper.Events;
+﻿using Helper.Models.Events;
 
 namespace Helper.UserControls
 {
@@ -12,10 +12,7 @@ namespace Helper.UserControls
             set
             {
                 _event = value;
-                if (value != null)
-                    _tbName.Text = value.Name;
-                else
-                    _tbName.Text = null;
+                _tbName.Text = value?.Name;
             }
         }
 

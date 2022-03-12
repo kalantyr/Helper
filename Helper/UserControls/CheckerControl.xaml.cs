@@ -99,7 +99,8 @@ namespace Helper.UserControls
 
         private void OnCopyClick(object sender, RoutedEventArgs e)
         {
-            Checker.CopyToClipboard();
+            var text = Checker.GetTextForClipboard();
+            Clipboard.SetText(text);
         }
 
         private void OnHistoryClick(object sender, RoutedEventArgs e)

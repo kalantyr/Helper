@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Helper.Jobs
+namespace Helper.Models
 {
     public interface IHistory
     {

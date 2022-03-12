@@ -9,14 +9,14 @@ namespace Helper.Windows
         {
             InitializeComponent();
 
-            _pwdBox.Password = Settings.Default.Password;
+           // _pwdBox.Password = Settings.Default.Password;
         }
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
             try
             {
-                Settings.Default.Password = _pwdBox.Password;
+             //   Settings.Default.Password = _pwdBox.Password;
                 Settings.Default.Save();
                 MessageBox.Show("Done");
             }

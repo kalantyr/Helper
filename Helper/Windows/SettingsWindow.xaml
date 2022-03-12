@@ -23,8 +23,8 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Password: "/>
-            <PasswordBox x:Name="_pwdBox" Grid.Column="1"/>
+            <TextBlock Text="Password: " Visibility="Collapsed"/>
+            <PasswordBox x:Name="_pwdBox" Visibility="Collapsed" Grid.Column="1"/>
         </Grid>
 
         <StackPanel Grid.Row="2" HorizontalAlignment="Right">
