@@ -1,4 +1,4 @@
-﻿using Helper.Jobs.Impl;
+﻿using Helper.Core.Jobs.Impl;
 using NUnit.Framework;
 
 namespace Helper.Tests.Jobs

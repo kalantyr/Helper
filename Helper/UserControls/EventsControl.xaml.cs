@@ -3,7 +3,8 @@ using System.Linq;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
-using Helper.Models.Events;
+using Helper.Core;
+using Helper.Core.Events;
 
 namespace Helper.UserControls
 {

@@ -4,8 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
+using Helper.Core.Jobs;
+using Helper.Core.Jobs.Impl;
 using Helper.Jobs;
-using Helper.Jobs.Impl;
 
 namespace Helper.UserControls
 {

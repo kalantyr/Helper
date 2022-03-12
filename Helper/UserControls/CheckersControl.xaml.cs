@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
-using Helper.Checkers;
+using Helper.Core;
+using Helper.Core.Checkers;
 using Helper.Utils;
 
 namespace Helper.UserControls
@@ -51,12 +52,12 @@ namespace Helper.UserControls
             TuneControls();
         }
 
-        private void OnNotify(object sender, EventArgs e)
+        private void OnNotify(IChecker sender)
         {
             if (Dispatcher.CheckAccess())
                 WindowsUtils.Flash(Application.Current.MainWindow);
             else
-                Dispatcher.Invoke(() => OnNotify(sender, e));
+                Dispatcher.Invoke(() => OnNotify(sender));
         }
 
         public IChecker[] SelectedCheckers

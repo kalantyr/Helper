@@ -2,17 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Helper.Checkers;
-using Helper.Jobs;
-using Helper.Jobs.Impl;
-using Helper.Models.Events;
-using Helper.Utils;
+using Helper.Core.Checkers;
+using Helper.Core.Events;
+using Helper.Core.Jobs;
+using Helper.Core.Jobs.Impl;
+using Helper.Core.Utils;
 
-namespace Helper
+namespace Helper.Core
 {
     public class Project
     {
-
         public event Action<Project, IChecker> CheckerRemoved;
 
         [System.Text.Json.Serialization.JsonIgnore]
@@ -144,9 +143,9 @@ namespace Helper
 
     public class AllCheckers
     {
-        public ChatAvailableChecker[] ChatAvailableCheckers { get; set; }
+        public ChatAvailableChecker[] ChatAvailableCheckers { get; set; } = Array.Empty<ChatAvailableChecker>();
 
-        public BngChecker[] BngCheckers { get; set; }
+        public BngChecker[] BngCheckers { get; set; } = Array.Empty<BngChecker>();
     }
 
     public class AllJobs
@@ -181,6 +180,6 @@ namespace Helper
 
     public class AllEvents
     {
-        public TimeEvent[] TimeEvents { get; set; }
+        public TimeEvent[] TimeEvents { get; set; } = Array.Empty<TimeEvent>();
     }
 }

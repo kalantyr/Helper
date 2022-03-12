@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Helper.Jobs\Helper.Jobs.csproj" />
+    <ProjectReference Include="..\..\Helper.Core\Helper.Core.csproj" />
   </ItemGroup>
 
 </Project>

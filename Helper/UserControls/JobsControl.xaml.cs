@@ -5,6 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using Helper.Core;
+using Helper.Core.Jobs;
 using Helper.Jobs;
 
 namespace Helper.UserControls

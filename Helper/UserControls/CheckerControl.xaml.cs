@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
-using Helper.Checkers;
+using Helper.Core.Checkers;
 
 namespace Helper.UserControls
 {

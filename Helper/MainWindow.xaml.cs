@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Windows;
+using Helper.Core;
 using Helper.Tools;
 using Helper.Utils;
 using Helper.Windows;

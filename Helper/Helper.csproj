@@ -8,10 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Helper.Checkers\Helper.Checkers.csproj" />
-    <ProjectReference Include="..\Helper.Jobs\Helper.Jobs.csproj" />
-    <ProjectReference Include="..\Helper.Models\Helper.Models.csproj" />
-    <ProjectReference Include="..\Helper.Utils\Helper.Utils.csproj" />
+    <ProjectReference Include="..\Helper.Core\Helper.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

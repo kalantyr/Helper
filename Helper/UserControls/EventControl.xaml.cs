@@ -1,4 +1,4 @@
-﻿using Helper.Models.Events;
+﻿using Helper.Core.Events;
 
 namespace Helper.UserControls
 {
